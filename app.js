@@ -32,7 +32,7 @@ function saveNotes() {
   localStorage.setItem("quickNotes", JSON.stringify(notes));
 }
 
-function deleteNotes(noteId) {
+function deleteNote(noteId) {
   notes = notes.filter((note) => note.id != noteId);
   saveNotes();
   renderNotes();
@@ -100,8 +100,7 @@ function openNoteDialog(noteId = null) {
     titleInput.value = "";
     contentInput.value = "";
   }
-
-  dialog.showModal();
+  if (noteId) dialog.showModal();
   titleInput.focus();
 }
 
