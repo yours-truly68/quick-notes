@@ -1,19 +1,20 @@
-let notes = [];
+let notes = []; //step 1
 let editingNoteId = null;
 
 function loadNotes() {
-  const savedNotes = localStorage.getItem("quickNotes");
-  return savedNotes ? JSON.parse(savedNotes) : [];
+  const savedNotes = localStorage.getItem("quickNotes"); //fetching from the local storage
+  return savedNotes ? JSON.parse(savedNotes) : []; //JSON.parse converts json to array
 }
 
+//step 6
 function saveNote(event) {
-  event.preventDefault();
+  event.preventDefault(); //stops the submit action
 
   const title = document.getElementById("noteTitle").value.trim();
   const content = document.getElementById("noteContent").value.trim();
 
   if (editingNoteId) {
-    // Update existing Note
+    //Update existing Note
 
     const noteIndex = notes.findIndex((note) => note.id === editingNoteId);
     notes[noteIndex] = {
@@ -22,7 +23,7 @@ function saveNote(event) {
       content: content,
     };
   } else {
-    // Add New Note
+    //Add a new note
     notes.unshift({
       id: generateId(),
       title: title,
@@ -31,16 +32,16 @@ function saveNote(event) {
   }
 
   closeNoteDialog();
-  saveNotes();
-  renderNotes();
+  saveNotes(); //now this takes the submitted content and then adds it to the local dadtabase
+  renderNotes(); //so that the page is immediately rendered as u press enter or submit
 }
 
 function generateId() {
-  return Date.now().toString();
+  return Date.now().toLocaleString();
 }
 
 function saveNotes() {
-  localStorage.setItem("quickNotes", JSON.stringify(notes));
+  localStorage.setItem("quickNotes", JSON.stringify(notes)); //now this adds the added notes on the local storage
 }
 
 function deleteNote(noteId) {
@@ -49,25 +50,23 @@ function deleteNote(noteId) {
   renderNotes();
 }
 
+//this is to render an UI when no note is on display//
 function renderNotes() {
   const notesContainer = document.getElementById("notesContainer");
-
-  if (notes.length === 0) {
-    // show some fall back elements
-    notesContainer.innerHTML = `
-      <div class="empty-state">
-        <h2>No notes yet</h2>
-        <p>Create your first note to get started!</p>
-        <button class="add-note-btn" onclick="openNoteDialog()">+ Add Your First Note</button>
-      </div>
+  if (notesContainer.length === 0) {
+    notesContainer.innerHtML = `
+    <div class="empty-state">
+    <h2> No notes yet</h2>
+    <p>Create your first note to get started!</p>
+    <button class = "add-note-btn" onclick = "openNoteDialog()">+ Add new note</button>
+    </div>
     `;
     return;
   }
-
-  notesContainer.innerHTML = notes
+  notesContainer.innerHTML = notes //this is if there is an entry in the database
     .map(
       (note) => `
-    <div class="note-card">
+        <div class="note-card">
       <h3 class="note-title">${note.title}</h3>
       <p class="note-content">${note.content}</p>
       <div class="note-actions">
@@ -84,27 +83,27 @@ function renderNotes() {
       </div>
 
     </div>
-    `
+        `
     )
     .join("");
 }
 
+//Step 2 - we declare openNoteDialog function
 function openNoteDialog(noteId = null) {
   const dialog = document.getElementById("noteDialog");
   const titleInput = document.getElementById("noteTitle");
   const contentInput = document.getElementById("noteContent");
 
   if (noteId) {
-    // Edit Mode
+    //Edting mode
     const noteToEdit = notes.find((note) => note.id === noteId);
     editingNoteId = noteId;
     document.getElementById("dialogTitle").textContent = "Edit Note";
     titleInput.value = noteToEdit.title;
     contentInput.value = noteToEdit.content;
   } else {
-    // Add Mode
     editingNoteId = null;
-    document.getElementById("dialogTitle").textContent = "Add New Note";
+    document.getElementById("dialogTitle").textContent = "Add new note";
     titleInput.value = "";
     contentInput.value = "";
   }
@@ -112,9 +111,9 @@ function openNoteDialog(noteId = null) {
   dialog.showModal();
   titleInput.focus();
 }
-
+//Step 3 - we declare the closeNoteDialog function;
 function closeNoteDialog() {
-  document.getElementById("noteDialog").close();
+  document.getElementById("noteDialog").closest();
 }
 
 function toggleTheme() {
@@ -129,22 +128,17 @@ function applyStoredTheme() {
     document.getElementById("themeToggleBtn").textContent = "☀️";
   }
 }
-
+//Step 4 - we add an EventListener to the DOM so that we can record every interaction, and here we make sure that a click outside the frame of the Dialog closes the dialog
 document.addEventListener("DOMContentLoaded", function () {
   applyStoredTheme();
-  notes = loadNotes();
-  renderNotes();
+  notes = loadNotes(); // and also for already existing notes to load and for render to work ofc
+  renderNotes(); //we can the notes to be rendered as the page loads
 
-  document.getElementById("noteForm").addEventListener("submit", saveNote);
-  document
-    .getElementById("themeToggleBtn")
-    .addEventListener("click", toggleTheme);
-
-  document
-    .getElementById("noteDialog")
-    .addEventListener("click", function (event) {
-      if (event.target === this) {
-        closeNoteDialog();
-      }
-    });
+  document.getElementById("noteForm").addEventListener("submit", saveNote); //step 5 - we now declare how to save the note - saveNote();
+  document.getElementById("noteDialog").addEventListener("click", (event) => {
+    if (event.target === this) {
+      //this refers to DOMcontent
+      closeNoteDialog();
+    }
+  });
 });
